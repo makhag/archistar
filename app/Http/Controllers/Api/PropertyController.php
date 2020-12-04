@@ -24,12 +24,48 @@ class PropertyController extends Controller
         $this->repo = $repo;
     }
 
-    public function test()
+    /**
+     * @param $suburb
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function suburbSummary($suburb)
     {
-//        CreatePropertySuburbReport::dispatchNow('Parramatta');
-////        $reports = $this->repo->suburbReports('Parramatta');
-////        dd($reports);
-///
-        CreatePropertySuburbReports::dispatch();
+        $summary = $this->repo->getSuburbSummary($suburb);
+
+        if (!empty($summary)) {
+            return response()->json($summary);
+        }
+
+        return response()->json(['error' => 'Suburb not found'], 404);
+    }
+
+    /**
+     * @param $state
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function stateSummary($state)
+    {
+        $summary = $this->repo->getStateSummary($state);
+
+        if (!empty($summary)) {
+            return response()->json($summary);
+        }
+
+        return response()->json(['error' => 'State not found'], 404);
+    }
+
+    /**
+     * @param $suburb
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function countrySummary($country)
+    {
+        $summary = $this->repo->getCountrySummary($country);
+
+        if (!empty($summary)) {
+            return response()->json($summary);
+        }
+
+        return response()->json(['error' => 'Country not found'], 404);
     }
 }

@@ -5,6 +5,7 @@ use App\Models\Property;
 use App\Models\PropertySuburbReport;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class PropertyRepository
@@ -78,5 +79,136 @@ class PropertyRepository
             'state',
             'country'
         ]);
+    }
+
+    /**
+     * @param string $suburb
+     * @param bool $fromCache
+     * @return array|null
+     */
+    public function getSuburbSummary($suburb, $fromCache = true)
+    {
+        $cacheKey = 'suburb_' .strtolower($suburb);
+
+        if (!$fromCache || !Cache::has($cacheKey)) {
+
+            $reportData = [];
+
+            $data = PropertySuburbReport::from('property_suburb_report as r')
+                ->join('analytics_types as t', 'r.analytic_type_id', '=', 't.id')
+                ->where('r.suburb', $suburb)
+                ->get([
+                    'r.suburb',
+                    'r.state',
+                    'r.country',
+                    'r.analytic_type_id',
+                    't.name as analytic_type',
+                    'r.min_value',
+                    'r.max_value',
+                    'r.avg_value as median_value',
+                    'r.property_count',
+                    'r.analytic_count',
+                    DB::raw('round((r.analytic_count / r.property_count) * 100, 2) as percentage_properties_with_a_value'),
+                    DB::raw('round(((r.property_count - r.analytic_count) / r.property_count) * 100, 2) as percentage_properties_without_a_value')
+                ]);
+
+            /** @var PropertySuburbReport $report */
+            foreach ($data as $report) {
+                $reportData[] = $report->toArray();
+            }
+
+            if (!empty($reportData)) {
+                Cache::put($cacheKey, $reportData);
+            }
+        }
+
+        return Cache::get($cacheKey);
+    }
+
+    /**
+     * @param string $state
+     * @param bool $fromCache
+     * @return array|null
+     */
+    public function getStateSummary($state, $fromCache = true)
+    {
+        $cacheKey = 'state_' .strtolower($state);
+
+        if (!$fromCache || !Cache::has($cacheKey)) {
+
+            $reportData = [];
+
+            $data = PropertySuburbReport::from('property_suburb_report as r')
+                ->join('analytics_types as t', 'r.analytic_type_id', '=', 't.id')
+                ->where('r.state', $state)
+                ->groupBy(['r.analytic_type_id', 'r.state', 'r.country', 't.name'])
+                ->get([
+                    'r.state',
+                    'r.country',
+                    'r.analytic_type_id',
+                    't.name as analytic_type',
+                    DB::raw('min(r.min_value) as min_value'),
+                    DB::raw('max(r.max_value) as max_value'),
+                    DB::raw('avg(r.avg_value) as median_value'),
+                    DB::raw('sum(r.property_count) as property_count'),
+                    DB::raw('sum(r.analytic_count) as analytic_count'),
+                    DB::raw('round((sum(r.analytic_count) / sum(r.property_count)) * 100, 2) as percentage_properties_with_a_value'),
+                    DB::raw('round(((sum(r.property_count) - sum(r.analytic_count)) / sum(r.property_count)) * 100, 2) as percentage_properties_without_a_value')
+                ]);
+
+            /** @var PropertySuburbReport $report */
+            foreach ($data as $report) {
+                $reportData[] = $report->toArray();
+            }
+
+            if (!empty($reportData)) {
+                Cache::put($cacheKey, $reportData);
+            }
+        }
+
+        return Cache::get($cacheKey);
+    }
+
+    /**
+     * @param string $country
+     * @param bool $fromCache
+     * @return array|null
+     */
+    public function getCountrySummary($country, $fromCache = true)
+    {
+        $cacheKey = 'country_' .strtolower($country);
+
+        if (!$fromCache || !Cache::has($cacheKey)) {
+
+            $reportData = [];
+
+            $data = PropertySuburbReport::from('property_suburb_report as r')
+                ->join('analytics_types as t', 'r.analytic_type_id', '=', 't.id')
+                ->where('r.country', $country)
+                ->groupBy(['r.analytic_type_id', 'r.country', 't.name'])
+                ->get([
+                    'r.country',
+                    'r.analytic_type_id',
+                    't.name as analytic_type',
+                    DB::raw('min(r.min_value) as min_value'),
+                    DB::raw('max(r.max_value) as max_value'),
+                    DB::raw('avg(r.avg_value) as median_value'),
+                    DB::raw('sum(r.property_count) as property_count'),
+                    DB::raw('sum(r.analytic_count) as analytic_count'),
+                    DB::raw('round((sum(r.analytic_count) / sum(r.property_count)) * 100, 2) as percentage_properties_with_a_value'),
+                    DB::raw('round(((sum(r.property_count) - sum(r.analytic_count)) / sum(r.property_count)) * 100, 2) as percentage_properties_without_a_value')
+                ]);
+
+            /** @var PropertySuburbReport $report */
+            foreach ($data as $report) {
+                $reportData[] = $report->toArray();
+            }
+
+            if (!empty($reportData)) {
+                Cache::put($cacheKey, $reportData);
+            }
+        }
+
+        return Cache::get($cacheKey);
     }
 }

@@ -15,4 +15,6 @@ use App\Http\Controllers\Api\PropertyController;
 |
 */
 
-Route::get('properties/test', [PropertyController::class, 'test']);
+Route::get('properties/suburb-summary/{suburb}', [PropertyController::class, 'suburbSummary']);
+Route::get('properties/state-summary/{state}', [PropertyController::class, 'stateSummary']);
+Route::get('properties/country-summary/{country}', [PropertyController::class, 'countrySummary']);
