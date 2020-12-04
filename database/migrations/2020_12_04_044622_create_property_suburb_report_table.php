@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Jobs\CreatePropertySuburbReports;
 
 class CreatePropertySuburbReportTable extends Migration
 {
@@ -19,6 +20,7 @@ class CreatePropertySuburbReportTable extends Migration
             $table->string('state');
             $table->string('country');
             $table->bigInteger('analytic_type_id', false, true);
+            $table->integer('analytic_count', false, true);
             $table->integer('property_count', false, true);
             $table->decimal('min_value');
             $table->decimal('max_value');
@@ -33,7 +35,8 @@ class CreatePropertySuburbReportTable extends Migration
             $table->foreign('analytic_type_id')->references('id')->on('analytics_types');
         });
 
-
+        // generate report data
+        CreatePropertySuburbReports::dispatch();
     }
 
     /**

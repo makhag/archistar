@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
  * @property string $state
  * @property string $country
  * @property int $analytic_type_id
+ * @property int $analytic_count
  * @property int $property_count
  * @property float $min_value
  * @property float $max_value
@@ -30,7 +31,7 @@ class PropertySuburbReport extends Model
 {
     use HasFactory;
 
-    protected $table = 'properties';
+    protected $table = 'property_suburb_report';
     protected $primaryKey = 'id';
     public $timestamps = true;
 
@@ -40,6 +41,7 @@ class PropertySuburbReport extends Model
         'state' => 'string',
         'country' => 'string',
         'analytic_type_id' => 'int',
+        'analytic_count' => 'int',
         'property_count' => 'int',
         'min_value' => 'float',
         'max_value' => 'float',
@@ -56,6 +58,7 @@ class PropertySuburbReport extends Model
         'state',
         'country',
         'analytic_type_id',
+        'analytic_count',
         'property_count',
         'min_value',
         'max_value',
