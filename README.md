@@ -1,61 +1,44 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+## Archistar Test
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This test requires the following artisan commands to be run:
+- $ ./artisan migrate
+- $ ./artisan test
 
-## About Laravel
+## $ ./artisan migrate
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The following tables are created:
+- properties - seeded with data from spreadsheet
+- analytics_types - seeded with data from spreadsheet
+- property_analytics - seeded with data from spreadsheet
+- property_suburb_report - CreatePropertySuburbReports job is dispatched and generated report data is saved.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## $ ./artisan test
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The following tests are run:
+- Tests\Feature\PropertyTest
+- Tests\Unit\PropertyTest
 
-## Learning Laravel
+## Tests\Feature\PropertyTest
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- testAddProperty() - this posts data to the /api/properties/add api endpoint to add a property, and then dispatches the CreatePropertySuburbReport job for this specific suburb
+- testAddPropertyFails() - this posts invalid data to the /api/properties/add api endpoint
+- testAddEditPropertyAnalytic() - this posts data to the /api/properties/analytic/add to add or edit a property analytic, and  then dispatches the CreatePropertySuburbReport job for this specific suburb
+- testAddEditPropertyAnalyticFails() - this posts invalid data to the /api/properties/analytic/add
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Tests\Unit\PropertyTest
 
-## Laravel Sponsors
+- testCreateSuburbReport() - this tests that the object returned from PropertyRepository getCreateSuburbReport() function is an instance of PropertySuburbReport 
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## API Endpoints
 
-### Premium Partners
+These are the additional api endpoints:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+- properties/property-summary/{guid} - retrieves and displays the property and property analytics data from the database
+- properties/suburb-summary/{suburb} - retrieves and displays the suburb summary from cache if exists, or else from the database
+- properties/state-summary/{state} - retrieves and displays the state summary from cache if exists, or else from the database
+- properties/country-summary/{country} - retrieves and displays the country summary from cache if exists, or else from the database
 
-## Contributing
+## Jobs
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- CreatePropertySuburbReports - retrieves all distinct suburbs from the database and foreach suburb dispatches the CreatePropertySuburbReport job
+- CreatePropertySuburbReport - generates and saves summary report data for the suburb the caches the data for its suburb, state and country
