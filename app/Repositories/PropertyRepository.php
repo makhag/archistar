@@ -11,6 +11,15 @@ use Illuminate\Support\Facades\DB;
 class PropertyRepository
 {
     /**
+     * @param string $guid
+     * @return Property
+     */
+    public function getPropertyWithAnalytics($guid)
+    {
+        return Property::where('guid', $guid)->with('analytics')->first();
+    }
+
+    /**
      * @param string $suburb
      * @return Collection
      */

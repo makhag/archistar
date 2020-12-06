@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Property;
 use App\Repositories\PropertyRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,18 +35,29 @@ class CreatePropertySuburbReport implements ShouldQueue
     {
         // count properties for suburb
         $propertyCount = $repo->getSuburbPropertyCount($this->suburb);
+
         // generate report data for suburb
         $reportData = $repo->getSuburbReportData($this->suburb);
 
+        /** @var Property $entry */
         foreach ($reportData as $entry) {
+
             // get existing or new report object
             $report = $repo->getCreateSuburbReport($entry->suburb, $entry->analytic_type_id);
+
             // fill object with report data
             $report->fill($entry->toArray());
+
             // add property count
             $report->property_count = $propertyCount;
 
+            // save report object to database
             $repo->saveSuburbReport($report);
         }
+
+        // cache report data for suburb, state and country
+        $repo->getSuburbSummary($entry->suburb, false);
+        $repo->getStateSummary($entry->state, false);
+        $repo->getCountrySummary($entry->country, false);
     }
 }

@@ -25,7 +25,22 @@ class PropertyController extends Controller
     }
 
     /**
-     * @param $suburb
+     * @param string $guid
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function propertySummary($guid)
+    {
+        $property = $this->repo->getPropertyWithAnalytics($guid);
+
+        if (!empty($property)) {
+            return response()->json($property);
+        }
+
+        return response()->json(['error' => 'Property not found'], 404);
+    }
+
+    /**
+     * @param string $suburb
      * @return \Illuminate\Http\JsonResponse
      */
     public function suburbSummary($suburb)
@@ -40,7 +55,7 @@ class PropertyController extends Controller
     }
 
     /**
-     * @param $state
+     * @param string $state
      * @return \Illuminate\Http\JsonResponse
      */
     public function stateSummary($state)
@@ -55,7 +70,7 @@ class PropertyController extends Controller
     }
 
     /**
-     * @param $suburb
+     * @param string $country
      * @return \Illuminate\Http\JsonResponse
      */
     public function countrySummary($country)

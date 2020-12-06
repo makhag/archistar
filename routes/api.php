@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\PropertyController;
 |
 */
 
+Route::get('properties/property-summary/{guid}', [PropertyController::class, 'propertySummary']);
 Route::get('properties/suburb-summary/{suburb}', [PropertyController::class, 'suburbSummary']);
 Route::get('properties/state-summary/{state}', [PropertyController::class, 'stateSummary']);
 Route::get('properties/country-summary/{country}', [PropertyController::class, 'countrySummary']);
