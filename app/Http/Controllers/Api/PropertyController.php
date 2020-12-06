@@ -33,7 +33,7 @@ class PropertyController extends Controller
      */
     public function addProperty(PropertyRequest $request)
     {
-        $property = new Property;
+        $property = $this->repo->getCreateProperty($request->get('guid'));
         $property->fill($request->validated());
         $property = $this->repo->saveProperty($property);
 
@@ -64,6 +64,9 @@ class PropertyController extends Controller
 
         // save PropertyAnalytic
         $propertyAnalytic = $this->repo->savePropertyAnalytic($propertyAnalytic);
+
+        // dispatch job to generate report data for suburb and cache summary data
+        CreatePropertySuburbReport::dispatch($property->suburb);
 
         // assign property and analyticType for display purposes
         $propertyAnalytic->property = $property;

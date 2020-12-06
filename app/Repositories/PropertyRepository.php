@@ -44,6 +44,15 @@ class PropertyRepository
     }
 
     /**
+     * @param string|null $guid
+     * @return Property
+     */
+    public function getCreateProperty($guid = null)
+    {
+        return Property::firstOrNew(['guid' => $guid]);
+    }
+
+    /**
      * @param Property $property
      * @return Property
      */
