@@ -44,6 +44,7 @@ class Property extends Model
     ];
 
     protected $fillable = [
+        'id',
         'guid',
         'suburb',
         'state',

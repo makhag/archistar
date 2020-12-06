@@ -12,6 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        // switch of csrf verification for this test.
+        'api/properties/*',
     ];
 }

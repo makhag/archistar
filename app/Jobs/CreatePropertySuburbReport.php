@@ -39,6 +39,11 @@ class CreatePropertySuburbReport implements ShouldQueue
         // generate report data for suburb
         $reportData = $repo->getSuburbReportData($this->suburb);
 
+        // no report data
+        if ($reportData->isEmpty()) {
+            return;
+        }
+
         /** @var Property $entry */
         foreach ($reportData as $entry) {
 

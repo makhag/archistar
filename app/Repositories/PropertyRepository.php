@@ -1,15 +1,39 @@
 <?php
 namespace App\Repositories;
 
+use App\Models\AnalyticType;
 use App\Models\Property;
+use App\Models\PropertyAnalytic;
 use App\Models\PropertySuburbReport;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class PropertyRepository
 {
+    /**
+     * @param string $guid
+     * @param bool $fromCache
+     * @return Property
+     */
+    public function getProperty($guid, $fromCache = true)
+    {
+        $cacheKey = 'property_' .$guid;
+
+        if (!$fromCache || !Cache::has($cacheKey)) {
+            /** @var Property $property */
+            $property = Property::where('guid', $guid)->first();
+
+            if (!empty($property)) {
+                Cache::put($cacheKey, $property->toArray());
+            }
+        }
+
+        return new Property(Cache::get($cacheKey));
+    }
+
     /**
      * @param string $guid
      * @return Property
@@ -17,6 +41,67 @@ class PropertyRepository
     public function getPropertyWithAnalytics($guid)
     {
         return Property::where('guid', $guid)->with('analytics')->first();
+    }
+
+    /**
+     * @param Property $property
+     * @return Property
+     */
+    public function saveProperty(Property $property)
+    {
+        $property->guid = empty($property->guid) ? (string) Str::uuid() : $property->guid;
+        $property->created_at = empty($property->created_at) ? Carbon::now() : $property->created_at;
+        $property->updated_at = Carbon::now();
+        $property->save();
+
+        return $property;
+    }
+
+    /**
+     * @param string $name
+     * @param bool $fromCache
+     * @return AnalyticType
+     */
+    public function getAnalyticType($name, $fromCache = true)
+    {
+        $cacheKey = 'analytic_' .$name;
+
+        if (!$fromCache || !Cache::has($cacheKey)) {
+            /** @var AnalyticType $property */
+            $analyticType = AnalyticType::where('name', $name)->first();
+
+            if (!empty($analyticType)) {
+                Cache::put($cacheKey, $analyticType->toArray());
+            }
+        }
+
+        return new AnalyticType(Cache::get($cacheKey));
+    }
+
+    /**
+     * @param Property $property
+     * @param AnalyticType $analyticType
+     * @return PropertyAnalytic
+     */
+    public function getPropertyAnalytic(Property $property, AnalyticType $analyticType)
+    {
+        return PropertyAnalytic::firstOrNew([
+            'property_id' => $property->id,
+            'analytic_type_id' => $analyticType->id
+        ]);
+    }
+
+    /**
+     * @param PropertyAnalytic $propertyAnalytic
+     * @return PropertyAnalytic
+     */
+    public function savePropertyAnalytic(PropertyAnalytic $propertyAnalytic)
+    {
+        $propertyAnalytic->created_at = empty($propertyAnalytic->created_at) ? Carbon::now() : $propertyAnalytic->created_at;
+        $propertyAnalytic->updated_at = Carbon::now();
+        $propertyAnalytic->save();
+
+        return $propertyAnalytic;
     }
 
     /**

@@ -41,5 +41,10 @@ class AnalyticType extends Model
     ];
 
     protected $fillable = [
+        'id',
+        'name',
+        'units',
+        'is_numeric',
+        'num_decimal_places'
     ];
 }

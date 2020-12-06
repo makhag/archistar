@@ -42,6 +42,9 @@ class PropertyAnalytic extends Model
     ];
 
     protected $fillable = [
+        'property_id',
+        'analytic_type_id',
+        'value'
     ];
 
     /**

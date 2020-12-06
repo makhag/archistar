@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\PropertyController;
 |
 */
 
+Route::post('properties/add', [PropertyController::class, 'addProperty']);
+Route::post('properties/analytic/add', [PropertyController::class, 'addPropertyAnalytic']);
 Route::get('properties/property-summary/{guid}', [PropertyController::class, 'propertySummary']);
 Route::get('properties/suburb-summary/{suburb}', [PropertyController::class, 'suburbSummary']);
 Route::get('properties/state-summary/{state}', [PropertyController::class, 'stateSummary']);
